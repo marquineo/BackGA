@@ -46,9 +46,7 @@ class UserController extends Controller
             'role_id' => 'required|numeric',
             'foto' => 'nullable|image|max:2048',
         ]);
-    
         $fotoURL = null;
-    
         if ($request->hasFile('foto')) {
             $foto = $request->file('foto');
             $path = $foto->store('public/atletas');
@@ -57,7 +55,6 @@ class UserController extends Controller
         } else {
             //\Log::warning('El archivo "foto" no se recibió en el request.');
         }
-    
         $user = User::create([
             'name' => $request->nombre,
             'username' => $request->username,
@@ -69,10 +66,8 @@ class UserController extends Controller
             'trainer_id' => $request->trainer_id,
             'fotoURL' => $fotoURL
         ]);
-    
         return response()->json($user, 201);
     }
-    
     public function showByTrainer_id($trainer_id)
     {
         $clientes = $clientes = User::where('trainer_id', $trainer_id)
