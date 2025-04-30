@@ -81,10 +81,17 @@ class UserController extends Controller
         $user->update($request->all());
         return $user;
     }
-    public function destroy(User $user)
+    public function destroy($id)
     {
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json(['mensaje' => 'Usuario no encontrado'], 404);
+        }
+
         $user->delete();
-        return response(null, 204);
+
+        return response()->json(['mensaje' => 'Usuario eliminado correctamente'], 200);
     }
 
     public function checkUserLogin(Request $request)
