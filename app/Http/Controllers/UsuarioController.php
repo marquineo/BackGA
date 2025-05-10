@@ -15,25 +15,25 @@ class UsuarioController extends Controller
 {
     public function index()
     {
-        return User::all();
+        return Usuario::all();
     }
-    public function indexUserByID($id)
+    public function indexUsuarioByID($id)
     {
-        $User = User::find($id);
+        $Usuario = Usuario::find($id);
 
-        if (!$User) {
+        if (!$Usuario) {
             return response()->json([
                 'success' => false,
                 'status' => 404,
-                'message' => 'User no encontrado.'
+                'message' => 'Usuario no encontrado.'
             ]);
         }
 
         return response()->json([
             'success' => true,
             'status' => 200,
-            'message' => 'User encontrado.',
-            'data' => $User
+            'message' => 'Usuario encontrado.',
+            'data' => $Usuario
         ]);
     }
     public function store(Request $request)
@@ -57,39 +57,39 @@ class UsuarioController extends Controller
     }
     public function showByTrainer_id($trainer_id)
     {
-        $clientes = $clientes = User::where('trainer_id', $trainer_id)
+        $clientes = $clientes = Usuario::where('trainer_id', $trainer_id)
             ->where('role_id', 3) //solo clientes
             ->get();
 
         return response()->json($clientes);
     }
-    public function update(Request $request, User $user)
+    public function update(Request $request, Usuario $Usuario)
     {
-        $user->update($request->all());
-        return $user;
+        $Usuario->update($request->all());
+        return $Usuario;
     }
     public function destroy($id)
     {
-        $user = User::find($id);
+        $Usuario = Usuario::find($id);
 
-        if (!$user) {
+        if (!$Usuario) {
             return response()->json(['mensaje' => 'Usuario no encontrado'], 404);
         }
 
-        $user->delete();
+        $Usuario->delete();
 
         return response()->json(['mensaje' => 'Usuario eliminado correctamente'], 200);
     }
 
-    public function checkUserLogin(Request $request)
+    public function checkUsuarioLogin(Request $request)
     {
         $data = $request->validate([
-            'username' => 'required|string',
+            'Usuarioname' => 'required|string',
             'password' => 'required|string'
         ]);
 
         // Buscar al usuario por su nombre
-        $usuario = Usuario::where('nombre', $data['username'])->first();
+        $usuario = Usuario::where('nombre', $data['Usuarioname'])->first();
 
         if (!$usuario || !Hash::check($data['password'], $usuario->contrasenya)) {
             return response()->json([
