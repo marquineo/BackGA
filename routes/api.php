@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\TrainingBlockController;
 use App\Http\Controllers\WorkoutController;
 use App\Http\Controllers\ExerciseController;
@@ -10,13 +10,16 @@ use App\Http\Controllers\RoleController;
 
 //USERS
 Route::prefix('users')->group(function () {
-    Route::get('/', [UserController::class, 'index']);
-    Route::get('/{id}/indexUserByID', [UserController::class, 'indexUserByID']);
-    Route::post('/', [UserController::class, 'store']);
-    Route::get('/{trainer_id}/clientes', [UserController::class, 'showByTrainer_id']);
-    Route::put('/{id}', [UserController::class, 'update']);
-    Route::delete('/{id}', [UserController::class, 'destroy']);
-    Route::post('/login', [UserController::class, 'checkUserLogin']);
+    Route::get('/', [UsuarioController::class, 'index']);
+    Route::get('/{id}/indexUserByID', [UsuarioController::class, 'indexUserByID']);
+    Route::post('/', [UsuarioController::class, 'store']);
+    Route::get('/{trainer_id}/clientes', [UsuarioController::class, 'showByTrainer_id']);
+    Route::put('/{id}', [UsuarioController::class, 'update']);
+    Route::delete('/{id}', [UsuarioController::class, 'destroy']);
+    Route::post('/login', [UsuarioController::class, 'checkUserLogin']);
+    Route::post('/registrar/administrador', [UsuarioController::class, 'registrarAdministrador']);
+    Route::post('/registrar/entrenador', [UsuarioController::class, 'registrarEntrenador']);
+    Route::post('/registrar/cliente', [UsuarioController::class, 'registrarCliente']);
 });
 
 //TRAINIGN-BLOCKS
