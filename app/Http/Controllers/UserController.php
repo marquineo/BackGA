@@ -38,13 +38,13 @@ class UserController extends Controller
     {
         $request->validate([
             'nombre' => 'required|string',
-            'username' => 'required|string|unique:users,username',
+//            'username' => 'required|string|unique:users,username',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6',
-            'peso' => 'required|numeric',
-            'altura' => 'required|numeric',
+  //          'peso' => 'required|numeric',
+    //        'altura' => 'required|numeric',
             'role_id' => 'required|numeric',
-            'foto' => 'nullable|image|max:2048',
+      //      'foto' => 'nullable|image|max:2048',
         ]);
         $fotoURL = null;
         if ($request->hasFile('foto')) {
@@ -57,14 +57,14 @@ class UserController extends Controller
         }
         $user = User::create([
             'name' => $request->nombre,
-            'username' => $request->username,
+//            'username' => $request->username,
             'email' => $request->email,
             'password' => bcrypt($request->password),
-            'peso' => $request->peso,
-            'altura' => $request->altura,
+    //        'peso' => $request->peso,
+  //          'altura' => $request->altura,
             'role_id' => $request->role_id,
-            'trainer_id' => $request->trainer_id,
-            'fotoURL' => $fotoURL
+    //        'trainer_id' => $request->trainer_id,
+      //      'fotoURL' => $fotoURL
         ]);
         return response()->json($user, 201);
     }
@@ -103,7 +103,7 @@ class UserController extends Controller
         ]);
 
         // Buscar al usuario por su nombre de usuario
-        $user = User::where('username', $data['username'])->first();
+        $user = User::where('name', $data['username'])->first();
 
         // Verificar las credenciales
         if (!$user || !Hash::check($data['password'], $user->password)) {
