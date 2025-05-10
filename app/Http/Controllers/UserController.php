@@ -103,7 +103,7 @@ class UserController extends Controller
         ]);
 
         // Buscar al usuario por su nombre de usuario
-        $user = User::where('username', $data['username'])->first();
+        $user = User::where('user', $data['username'])->first();
 
         // Verificar las credenciales
         if (!$user || !Hash::check($data['password'], $user->password)) {
