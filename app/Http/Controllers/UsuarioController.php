@@ -55,14 +55,25 @@ class UsuarioController extends Controller
 
         return response()->json($usuario, 201);
     }
-    public function showByTrainer_id($trainer_id)
-    {
-        $clientes = $clientes = Usuario::where('trainer_id', $trainer_id)
-            ->where('role_id', 3) //solo clientes
-            ->get();
+public function showByTrainer_id($trainer_id)
+{
+    $clientes = \DB::table('clientes')
+        ->join('usuarios', 'clientes.usuario_id', '=', 'usuarios.id')
+        ->where('clientes.entrenador_id', $trainer_id)
+        ->select(
+            'usuarios.id as usuario_id',
+            'usuarios.nombre',
+            'usuarios.email',
+            'usuarios.fotoURL',
+            'clientes.altura',
+            'clientes.peso',
+            'clientes.creado_en as cliente_creado_en'
+        )
+        ->get();
 
-        return response()->json($clientes);
-    }
+    return response()->json($clientes);
+}
+
     public function update(Request $request, Usuario $Usuario)
     {
         $Usuario->update($request->all());
@@ -81,7 +92,7 @@ class UsuarioController extends Controller
         return response()->json(['mensaje' => 'Usuario eliminado correctamente'], 200);
     }
 
-    public function checkUsuarioLogin(Request $request)
+    public function checkUserLogin(Request $request)
     {
         $data = $request->validate([
             'Usuarioname' => 'required|string',
@@ -140,21 +151,32 @@ class UsuarioController extends Controller
     {
         $request->validate([
             'nombre' => 'required|string',
-            'email' => 'required|email|unique:usuarios,email',
-            'contrasenya' => 'required|string|min:6',
+            'email' => 'required|email',//|unique:users,email
+            'contrasenya' => 'required|string',
             'altura' => 'required|numeric',
             'peso' => 'required|numeric',
-            'grasa_corporal' => 'required|numeric',
-            'fecha_nacimiento' => 'required|date',
-            'entrenador_id' => 'nullable|integer|exists:entrenadores,id'
+            'entrenador_id' => 'required|integer',
+            'foto' => 'nullable|image|max:2048',
         ]);
+
+        $fotoURL = null;
+
+        if ($request->hasFile('foto')) {
+            $foto = $request->file('foto');
+            $path = $foto->store('public/atletas');
+            $fotoURL = config('app.url') . Storage::url($path);
+            //\Log::info('Imagen subida:', ['url' => $fotoURL]);
+        } else {
+            //\Log::warning('El archivo "foto" no se recibió en el request.');
+        }
 
         $usuario = Usuario::create([
             'nombre' => $request->nombre,
             'email' => $request->email,
             'contrasenya' => bcrypt($request->contrasenya),
             'rol' => 'cliente',
-            'creado_en' => now()
+            'creado_en' => now(),
+            'fotoURL' => $fotoURL
         ]);
 
         $cliente = Cliente::create([
@@ -162,30 +184,28 @@ class UsuarioController extends Controller
             'entrenador_id' => $request->entrenador_id,
             'altura' => $request->altura,
             'peso' => $request->peso,
-            'grasa_corporal' => $request->grasa_corporal,
-            'fecha_nacimiento' => $request->fecha_nacimiento,
             'creado_en' => now()
         ]);
 
         return response()->json(['usuario' => $usuario, 'cliente' => $cliente], 201);
     }
 
-    
-public function registrarAdministrador(Request $request)
-{
-    $request->validate([
-        'nombre' => 'required|string',
-        'email' => 'required|email|unique:usuarios,email',
-        'password' => 'required|string|min:6',
-    ]);
 
-    $usuario = Usuario::create([
-        'nombre' => $request->nombre,
-        'email' => $request->email,
-        'contrasenya' => Hash::make($request->password),
-        'rol' => 'admin',
-    ]);
+    public function registrarAdministrador(Request $request)
+    {
+        $request->validate([
+            'nombre' => 'required|string',
+            'email' => 'required|email|unique:usuarios,email',
+            'password' => 'required|string|min:6',
+        ]);
 
-    return response()->json(['usuario' => $usuario], 201);
-}
+        $usuario = Usuario::create([
+            'nombre' => $request->nombre,
+            'email' => $request->email,
+            'contrasenya' => Hash::make($request->password),
+            'rol' => 'admin',
+        ]);
+
+        return response()->json(['usuario' => $usuario], 201);
+    }
 }

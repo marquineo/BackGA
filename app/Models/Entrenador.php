@@ -12,6 +12,8 @@ class Entrenador extends Model
     // Especifica el nombre de la tabla (si no sigue la convención plural en inglés)
     protected $table = 'entrenadores';
 
+        public $timestamps = false;
+
     // Definir qué campos son asignables en masa
     protected $fillable = [
         'usuario_id',
