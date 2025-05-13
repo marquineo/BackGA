@@ -17,7 +17,7 @@ class UsuarioController extends Controller
     {
         return Usuario::all();
     }
-    public function indexUsuarioByID($id)
+    public function indexUserByID($id)
     {
         $Usuario = Usuario::find($id);
 
@@ -55,24 +55,24 @@ class UsuarioController extends Controller
 
         return response()->json($usuario, 201);
     }
-public function showByTrainer_id($trainer_id)
-{
-    $clientes = \DB::table('clientes')
-        ->join('usuarios', 'clientes.usuario_id', '=', 'usuarios.id')
-        ->where('clientes.entrenador_id', $trainer_id)
-        ->select(
-            'usuarios.id as usuario_id',
-            'usuarios.nombre',
-            'usuarios.email',
-            'usuarios.fotoURL',
-            'clientes.altura',
-            'clientes.peso',
-            'clientes.creado_en as cliente_creado_en'
-        )
-        ->get();
+    public function showByTrainer_id($trainer_id)
+    {
+        $clientes = \DB::table('clientes')
+            ->join('usuarios', 'clientes.usuario_id', '=', 'usuarios.id')
+            ->where('clientes.entrenador_id', $trainer_id)
+            ->select(
+                'usuarios.id as usuario_id',
+                'usuarios.nombre',
+                'usuarios.email',
+                'usuarios.fotoURL',
+                'clientes.altura',
+                'clientes.peso',
+                'clientes.creado_en as cliente_creado_en'
+            )
+            ->get();
 
-    return response()->json($clientes);
-}
+        return response()->json($clientes);
+    }
 
     public function update(Request $request, Usuario $Usuario)
     {
@@ -110,6 +110,14 @@ public function showByTrainer_id($trainer_id)
             ]);
         }
 
+        /*if (!$usuario || $data['password'] !== $usuario->contrasenya) {
+            return response()->json([
+                'success' => false,
+                'status' => 404,
+                'message' => 'Credenciales incorrectas.'
+            ]);
+        }*/
+        
         return response()->json([
             'success' => true,
             'status' => 200,
@@ -144,6 +152,89 @@ public function showByTrainer_id($trainer_id)
         ]);
 
         return response()->json(['usuario' => $usuario, 'entrenador' => $entrenador], 201);
+    }
+
+    public function actualizarEntrenadorPorUsuarioId(Request $request, $usuarioId)
+    {
+        // Validar entrada
+        $request->validate([
+            'nombre' => 'nullable|string',
+            'email' => 'nullable|email',
+            'contrasenya' => 'nullable|string|min:6',
+            'especialidad' => 'nullable|string',
+            'experiencia' => 'nullable|integer|min:0',
+            'foto' => 'nullable|image|max:2048',
+        ]);
+
+        // Buscar entrenador con su usuario
+        $entrenador = Entrenador::with('usuario')->where('usuario_id', $usuarioId)->first();
+
+        if (!$entrenador) {
+            return response()->json(['error' => 'Entrenador no encontrado'], 404);
+        }
+
+        // Actualizar datos del usuario
+        $usuario = $entrenador->usuario;
+
+        if ($request->filled('nombre')) {
+            $usuario->nombre = $request->nombre;
+        }
+
+        if ($request->filled('email')) {
+            $usuario->email = $request->email;
+        }
+
+        if ($request->filled('contrasenya')) {
+            $usuario->contrasenya = bcrypt($request->contrasenya);
+        }
+
+        if ($request->hasFile('foto')) {
+            $foto = $request->file('foto');
+            $path = $foto->store('public/entrenadores');
+            $usuario->fotoURL = config('app.url') . Storage::url($path);
+        }
+
+        $usuario->save();
+
+        // Actualizar datos del entrenador
+        if ($request->filled('especialidad')) {
+            $entrenador->especialidad = $request->especialidad;
+        }
+
+        if ($request->filled('experiencia')) {
+            $entrenador->experiencia = $request->experiencia;
+        }
+
+        $entrenador->save();
+
+        return response()->json([
+            'mensaje' => 'Entrenador actualizado correctamente',
+            'usuario' => $usuario,
+            'entrenador' => $entrenador
+        ]);
+    }
+
+
+
+    public function indexEntrenadorByID($id)
+    {
+        $entrenador = Entrenador::with('usuario')->where('usuario_id', $id)->first();
+
+        if (!$entrenador) {
+            return response()->json(['error' => 'Entrenador no encontrado', 'id' => $id], 404);
+        }
+
+        return response()->json([
+            'id' => $entrenador->id,
+            'usuario_id' => $entrenador->usuario_id,
+            'nombre' => $entrenador->usuario->nombre,
+            'email' => $entrenador->usuario->email,
+            'fotoURL' => $entrenador->usuario->fotoURL,
+            'especialidad' => $entrenador->especialidad,
+            'experiencia' => $entrenador->experiencia,
+            'creado_en' => $entrenador->usuario->creado_en,
+        ]);
+
     }
 
 

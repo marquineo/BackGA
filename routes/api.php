@@ -13,13 +13,23 @@ Route::prefix('users')->group(function () {
     Route::get('/', [UsuarioController::class, 'index']);
     Route::get('/{id}/indexUserByID', [UsuarioController::class, 'indexUserByID']);
     Route::post('/', [UsuarioController::class, 'store']);
-    Route::get('/{trainer_id}/clientes', [UsuarioController::class, 'showByTrainer_id']);
     Route::put('/{id}', [UsuarioController::class, 'update']);
     Route::delete('/{id}', [UsuarioController::class, 'destroy']);
     Route::post('/login', [UsuarioController::class, 'checkUserLogin']);
-    Route::post('/registrar/administrador', [UsuarioController::class, 'registrarAdministrador']);
-    Route::post('/registrar/entrenador', [UsuarioController::class, 'registrarEntrenador']);
+
+
+    //clientes
     Route::post('/registrar/cliente', [UsuarioController::class, 'registrarCliente']);
+    Route::get('/{trainer_id}/clientes', [UsuarioController::class, 'showByTrainer_id']);
+
+    //entrenadores
+    Route::post('/registrar/entrenador', [UsuarioController::class, 'registrarEntrenador']);
+    Route::get('/{id}/indexEntrenadorByID', [UsuarioController::class, 'indexEntrenadorByID']);
+    Route::post('/{usuario_id}/actualizar/entrenador', [UsuarioController::class, 'actualizarEntrenadorPorUsuarioId']);
+
+
+    //administradores
+    Route::post('/registrar/administrador', [UsuarioController::class, 'registrarAdministrador']);
 });
 
 //TRAINIGN-BLOCKS
