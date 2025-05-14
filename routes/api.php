@@ -7,6 +7,7 @@ use App\Http\Controllers\WorkoutController;
 use App\Http\Controllers\ExerciseController;
 use App\Http\Controllers\ProgressController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\RutinaEntrenamientoController;
 
 //USERS
 Route::prefix('users')->group(function () {
@@ -30,6 +31,13 @@ Route::prefix('users')->group(function () {
 
     //administradores
     Route::post('/registrar/administrador', [UsuarioController::class, 'registrarAdministrador']);
+});
+//RUTINAS
+Route::prefix('rutinas')->group(function () { //CAMBIAR EL CONTROLADOR Y AÑADIR EL MODELO EN USE
+    Route::get('/{clienteId}', [RutinaEntrenamientoController::class, 'showRutinaByClienteId']);
+    Route::put('/cliente/{clienteId}', [RutinaEntrenamientoController::class, 'updateRutinaByClienteId']);
+    Route::post('/cliente/{clienteId}/ejercicio', [RutinaEntrenamientoController::class, 'storeRutinaByClienteId']);
+    Route::delete('/cliente/{clienteId}/ejercicio/{ejercicioId}', [RutinaEntrenamientoController::class, 'deleteRutinaByClienteId']);
 });
 
 //TRAINIGN-BLOCKS
