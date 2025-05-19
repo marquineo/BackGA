@@ -7,6 +7,8 @@ use App\Http\Controllers\WorkoutController;
 use App\Http\Controllers\ExerciseController;
 use App\Http\Controllers\ProgressController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\RutinaEntrenamientoController;
+use App\Http\Controllers\ProgresoController;
 
 //USERS
 Route::prefix('users')->group(function () {
@@ -31,6 +33,16 @@ Route::prefix('users')->group(function () {
     //administradores
     Route::post('/registrar/administrador', [UsuarioController::class, 'registrarAdministrador']);
 });
+//RUTINAS
+Route::prefix('rutinas')->group(function () { //CAMBIAR EL CONTROLADOR Y AÑADIR EL MODELO EN USE
+    Route::get('/{clienteId}', [RutinaEntrenamientoController::class, 'showRutinaByClienteId']);
+    Route::put('/cliente/{clienteId}', [RutinaEntrenamientoController::class, 'updateRutinaByClienteId']);
+    Route::post('/cliente/{clienteId}/ejercicio', [RutinaEntrenamientoController::class, 'storeRutinaByClienteId']);
+    Route::delete('/cliente/{clienteId}/ejercicio/{ejercicioId}', [RutinaEntrenamientoController::class, 'deleteRutinaByClienteId']);
+});
+
+Route::get('/progreso/{clienteId}', [ProgresoController::class, 'getProgreso']);
+
 
 //TRAINIGN-BLOCKS
 Route::prefix('training-blocks')->group(function () {
@@ -57,15 +69,6 @@ Route::prefix('exercises')->group(function () {
     Route::get('/{id}', [ExerciseController::class, 'show']);
     Route::put('/{id}', [ExerciseController::class, 'update']);
     Route::delete('/{id}', [ExerciseController::class, 'destroy']);
-});
-
-//PROGRESS
-Route::prefix('progress')->group(function () {
-    Route::get('/', [ProgressController::class, 'index']);
-    Route::post('/', [ProgressController::class, 'store']);
-    Route::get('/{id}', [ProgressController::class, 'show']);
-    Route::put('/{id}', [ProgressController::class, 'update']);
-    Route::delete('/{id}', [ProgressController::class, 'destroy']);
 });
 
 //ROLES

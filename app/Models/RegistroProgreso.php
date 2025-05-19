@@ -12,6 +12,7 @@ class RegistroProgreso extends Model
     // Especifica el nombre de la tabla (si no sigue la convención plural en inglés)
     protected $table = 'registros_progreso';
 
+    public $timestamps = false;
     // Definir qué campos son asignables en masa
     protected $fillable = [
         'cliente_id', 
@@ -20,6 +21,7 @@ class RegistroProgreso extends Model
         'grasa_corporal', 
         'repeticiones', 
         'tiempo_entrenamiento',
+        'creado_en',
     ];
 
     // Definir la relación con el modelo Cliente
