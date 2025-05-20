@@ -101,7 +101,6 @@ class UsuarioController extends Controller
 
         // Buscar al usuario por su nombre
         $usuario = Usuario::where('nombre', $data['Usuarioname'])->first();
-
         if (!$usuario || !Hash::check($data['password'], $usuario->contrasenya)) {
             return response()->json([
                 'success' => false,

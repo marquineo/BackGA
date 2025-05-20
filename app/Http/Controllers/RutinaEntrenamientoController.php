@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -7,88 +8,76 @@ use App\Models\EjercicioRutina;
 
 class RutinaEntrenamientoController extends Controller
 {
-    // ✅ GET: Mostrar rutina y sus ejercicios por cliente
-    public function showRutinaByClienteId($clienteId)
+    public function showRutinasByClienteId($clienteId)
     {
-        $rutina = RutinaEntrenamiento::with('ejercicios')
+        $rutinas = RutinaEntrenamiento::with('ejercicios')
             ->where('cliente_id', $clienteId)
-            ->first();
+            ->get();
 
-        if (!$rutina) {
-            return response()->json(['message' => 'No se encontró rutina para este cliente'], 404);
+        if ($rutinas->isEmpty()) {
+            return response()->json(['message' => 'No se encontraron rutinas para este cliente'], 404);
         }
 
-        return response()->json($rutina);
+        return response()->json($rutinas);
     }
 
-    // ✅ PUT: Actualizar la rutina general del cliente
-    public function updateRutinaByClienteId(Request $request, $clienteId)
+
+    public function guardarRutinas(Request $request, $clienteId)
     {
-        $request->validate([
+        $data = $request->validate([
             'nombre' => 'required|string',
             'descripcion' => 'nullable|string',
-            'duracion_semana' => 'required|integer|min:1'
+            'duracion_semana' => 'required|integer|min:1',
+            'ejercicios' => 'required|array',
+            'ejercicios.*.nombre_ejercicio' => 'required|string',
+            'ejercicios.*.series' => 'required|integer|min:1',
+            'ejercicios.*.repeticiones' => 'required|integer|min:1',
+            'ejercicios.*.descanso_segundos' => 'required|integer|min:1',
+            'ejercicios.*.dia_semana' => 'required|string',
+            'ejercicios.*.orden' => 'required|integer|min:1',
+            'ejercicios.*.rpe' => 'nullable|integer|min:1|max:10',
         ]);
 
-        $rutina = RutinaEntrenamiento::where('cliente_id', $clienteId)->first();
+        // Buscar o crear la rutina
+        $rutina = RutinaEntrenamiento::updateOrCreate(
+            [
+                'cliente_id' => $clienteId,
+                'nombre' => $data['nombre']
+            ],
+            [
+                'descripcion' => $data['descripcion'],
+                'duracion_semana' => $data['duracion_semana']
+            ]
+        );
 
-        if (!$rutina) {
-            return response()->json(['message' => 'Rutina no encontrada'], 404);
+        // Borrar ejercicios anteriores si existían
+        $rutina->ejercicios()->delete();
+
+        // Crear los nuevos ejercicios
+        foreach ($data['ejercicios'] as $ej) {
+            $rutina->ejercicios()->create($ej);
         }
 
-        $rutina->update([
-            'nombre' => $request->nombre,
-            'descripcion' => $request->descripcion,
-            'duracion_semana' => $request->duracion_semana
+        return response()->json([
+            'message' => 'Rutina guardada correctamente',
+            'rutina' => $rutina->load('ejercicios')
         ]);
-
-        return response()->json(['message' => 'Rutina actualizada correctamente', 'rutina' => $rutina]);
-    }
-
-    // ✅ POST: Agregar un nuevo ejercicio a la rutina del cliente
-    public function storeRutinaByClienteId(Request $request, $clienteId)
-    {
-        $request->validate([
-            'nombre_ejercicio' => 'required|string',
-            'repeticiones' => 'required|integer|min:1',
-            'series' => 'required|integer|min:1',
-            'dia_semana' => 'required|integer|min:0|max:6',
-            'descanso_segundos' => 'required|integer|min:0',
-            'orden' => 'required|integer|min:1'
-        ]);
-
-        $rutina = RutinaEntrenamiento::where('cliente_id', $clienteId)->first();
-
-        if (!$rutina) {
-            return response()->json(['message' => 'Rutina no encontrada para este cliente'], 404);
-        }
-
-        $ejercicio = new EjercicioRutina($request->all());
-        $ejercicio->rutina_id = $rutina->id;
-        $ejercicio->save();
-
-        return response()->json(['message' => 'Ejercicio agregado correctamente', 'ejercicio' => $ejercicio]);
     }
 
     // ✅ DELETE: Eliminar ejercicio específico por ID
-    public function deleteRutinaByClienteId($clienteId, $ejercicioId)
+    public function eliminarRutinas(Request $request, $clienteId)
     {
-        $rutina = RutinaEntrenamiento::where('cliente_id', $clienteId)->first();
+        $request->validate([
+            'nombres' => 'required|array',
+            'nombres.*' => 'string'
+        ]);
 
-        if (!$rutina) {
-            return response()->json(['message' => 'Rutina no encontrada para este cliente'], 404);
-        }
+        $nombres = $request->input('nombres');
 
-        $ejercicio = EjercicioRutina::where('rutina_id', $rutina->id)
-            ->where('id', $ejercicioId)
-            ->first();
+        RutinaEntrenamiento::where('cliente_id', $clienteId)
+            ->whereIn('nombre', $nombres)
+            ->delete();
 
-        if (!$ejercicio) {
-            return response()->json(['message' => 'Ejercicio no encontrado'], 404);
-        }
-
-        $ejercicio->delete();
-
-        return response()->json(['message' => 'Ejercicio eliminado correctamente']);
+        return response()->json(['message' => 'Rutinas eliminadas correctamente']);
     }
 }

@@ -10,6 +10,8 @@ class EjercicioRutina extends Model
 
     protected $table = 'ejercicios_rutina';
 
+        public $timestamps = false;
+
     protected $fillable = [
         'rutina_id',
         'nombre_ejercicio',
@@ -17,7 +19,8 @@ class EjercicioRutina extends Model
         'series',
         'dia_semana',
         'descanso_segundos',
-        'orden'
+        'orden',
+        'rpe'
     ];
 
     public function rutina()

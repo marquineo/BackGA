@@ -34,11 +34,11 @@ Route::prefix('users')->group(function () {
     Route::post('/registrar/administrador', [UsuarioController::class, 'registrarAdministrador']);
 });
 //RUTINAS
-Route::prefix('rutinas')->group(function () { //CAMBIAR EL CONTROLADOR Y AÑADIR EL MODELO EN USE
-    Route::get('/{clienteId}', [RutinaEntrenamientoController::class, 'showRutinaByClienteId']);
-    Route::put('/cliente/{clienteId}', [RutinaEntrenamientoController::class, 'updateRutinaByClienteId']);
-    Route::post('/cliente/{clienteId}/ejercicio', [RutinaEntrenamientoController::class, 'storeRutinaByClienteId']);
+Route::prefix('rutinas')->group(function () {
+    Route::get('/{clienteId}', [RutinaEntrenamientoController::class, 'showRutinasByClienteId']);
+    Route::put('/cliente/{clienteId}', [RutinaEntrenamientoController::class, 'guardarRutinas']);
     Route::delete('/cliente/{clienteId}/ejercicio/{ejercicioId}', [RutinaEntrenamientoController::class, 'deleteRutinaByClienteId']);
+    Route::post('/clientes/{clienteId}/rutinas/eliminar', [RutinaEntrenamientoController::class, 'eliminarRutinas']);
 });
 
 Route::get('/progreso/{clienteId}', [ProgresoController::class, 'getProgreso']);
