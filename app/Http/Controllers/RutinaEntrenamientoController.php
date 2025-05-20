@@ -33,7 +33,7 @@ class RutinaEntrenamientoController extends Controller
             'ejercicios.*.series' => 'required|integer|min:1',
             'ejercicios.*.repeticiones' => 'required|integer|min:1',
             'ejercicios.*.descanso_segundos' => 'required|integer|min:1',
-            'ejercicios.*.dia_semana' => 'required|string',
+            'ejercicios.*.dia_semana' => 'required|date',
             'ejercicios.*.orden' => 'required|integer|min:1',
             'ejercicios.*.rpe' => 'nullable|integer|min:1|max:10',
         ]);
@@ -62,6 +62,9 @@ class RutinaEntrenamientoController extends Controller
             'message' => 'Rutina guardada correctamente',
             'rutina' => $rutina->load('ejercicios')
         ]);
+        /**
+         * $email = ['name' => 'Tu Nombre']
+         */
     }
 
     // ✅ DELETE: Eliminar ejercicio específico por ID
