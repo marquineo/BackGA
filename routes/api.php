@@ -54,6 +54,9 @@ Route::prefix('rutinas')->group(function () {
     Route::post('/clientes/{clienteId}/rutinas/eliminar', [RutinaEntrenamientoController::class, 'eliminarRutinas']);
     //dashboard-entrenador
     Route::get('/clientes/{clienteId}/rutinas-con-ejercicios', [RutinaEntrenamientoController::class, 'getRutinasPorClienteConEjercicios']);
+//dashboard-cliente
+    Route::get('entrenamientos/{clienteId}', [RutinaEntrenamientoController::class, 'getEntrenamientoPorFecha']);
+    Route::get('/fechas-con-entrenamiento/{clienteId}', [RutinaEntrenamientoController::class, 'getFechasConEntrenamiento']);
 });
 
 

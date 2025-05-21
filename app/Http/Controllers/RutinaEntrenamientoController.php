@@ -92,4 +92,36 @@ class RutinaEntrenamientoController extends Controller
 
         return response()->json($rutinas);
     }
+
+    public function getEntrenamientoPorFecha(Request $request, $clienteId)
+{
+    $fecha = $request->query('fecha'); // formato esperado: 'YYYY-MM-DD'
+
+    // Buscamos todas las rutinas del cliente
+    $rutinas = RutinaEntrenamiento::with(['ejercicios' => function ($query) use ($fecha) {
+        $query->where('dia_semana', $fecha);
+    }])->where('cliente_id', $clienteId)->get();
+
+    // Filtramos solo las rutinas que tienen ejercicios ese día
+    $rutinasConEjercicios = $rutinas->filter(function ($rutina) {
+        return $rutina->ejercicios->isNotEmpty();
+    });
+
+    if ($rutinasConEjercicios->isEmpty()) {
+        return response()->json(['message' => 'No hay entrenamiento para esta fecha'], 404);
+    }
+
+    return response()->json($rutinasConEjercicios->values()); // devuelve solo las rutinas activas ese día
+}
+
+public function getFechasConEntrenamiento($clienteId)
+{
+    $fechas = EjercicioRutina::whereHas('rutina', function ($q) use ($clienteId) {
+        $q->where('cliente_id', $clienteId);
+    })->pluck('dia_semana')->unique();
+
+    return response()->json($fechas);
+}
+
+
 }
