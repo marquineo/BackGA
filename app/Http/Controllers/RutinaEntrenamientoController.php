@@ -83,4 +83,13 @@ class RutinaEntrenamientoController extends Controller
 
         return response()->json(['message' => 'Rutinas eliminadas correctamente']);
     }
+    //dashboard-entrenador
+    public function getRutinasPorClienteConEjercicios($clienteId)
+    {
+        $rutinas = RutinaEntrenamiento::with('ejercicios')
+            ->where('cliente_id', $clienteId)
+            ->get();
+
+        return response()->json($rutinas);
+    }
 }

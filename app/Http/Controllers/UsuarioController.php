@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Cliente;
 use App\Models\Entrenador;
+use Illuminate\Support\Facades\DB;
+
 
 
 class UsuarioController extends Controller
@@ -116,7 +118,7 @@ class UsuarioController extends Controller
                 'message' => 'Credenciales incorrectas.'
             ]);
         }*/
-        
+
         return response()->json([
             'success' => true,
             'status' => 200,
@@ -233,7 +235,6 @@ class UsuarioController extends Controller
             'experiencia' => $entrenador->experiencia,
             'creado_en' => $entrenador->usuario->creado_en,
         ]);
-
     }
 
 
@@ -241,7 +242,7 @@ class UsuarioController extends Controller
     {
         $request->validate([
             'nombre' => 'required|string',
-            'email' => 'required|email',//|unique:users,email
+            'email' => 'required|email', //|unique:users,email
             'contrasenya' => 'required|string',
             'altura' => 'required|numeric',
             'peso' => 'required|numeric',
@@ -298,4 +299,89 @@ class UsuarioController extends Controller
 
         return response()->json(['usuario' => $usuario], 201);
     }
+
+    public function getClienteByUsuarioId($usuario_id)
+    {
+        $cliente = Cliente::where('usuario_id', $usuario_id)->first();
+
+        if ($cliente) {
+            return response()->json([
+                'success' => true,
+                'status' => 200,
+                'message' => 'Cliente encontrado.',
+                'data' => $cliente
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'status' => 404,
+                'message' => 'Cliente no encontrado.'
+            ]);
+        }
+    }
+
+public function actualizarAtleta(Request $request, $id)
+{
+    $request->validate([
+        'nombre' => 'required|string|max:255',
+        'email' => 'required|email',
+        'peso' => 'required|numeric',
+        'altura' => 'required|numeric',
+        'contrasenya' => 'nullable|string',
+        'foto' => 'nullable|image|max:2048'
+    ]);
+
+    $usuario = Usuario::findOrFail($id);
+    $usuario->nombre = $request->nombre;
+    $usuario->email = $request->email;
+
+    if ($request->filled('contrasenya')) {
+        $usuario->contrasenya = bcrypt($request->contrasenya);
+    }
+
+    if ($request->hasFile('foto')) {
+        $foto = $request->file('foto');
+        $fotoNombre = time() . '_' . $foto->getClientOriginalName();
+        $path = $foto->storeAs('public/atletas', $fotoNombre);
+        $usuario->fotoURL = config('app.url') . Storage::url($path);
+        //\Log::info('Nueva imagen almacenada:', ['url' => $usuario->fotoURL]);
+    } else {
+        //\Log::warning('No se recibió la imagen en el request.');
+    }
+
+    $usuario->save();
+
+    $cliente = Cliente::where('usuario_id', $usuario->id)->firstOrFail();
+    $cliente->peso = $request->peso;
+    $cliente->altura = $request->altura;
+    $cliente->save();
+
+    return response()->json([
+        'message' => 'Atleta actualizado correctamente',
+        'data' => $usuario
+    ]);
+}
+
+public function eliminar($id)
+{
+    try {
+        // Eliminar cliente asociado (si existe)
+        DB::table('clientes')->where('usuario_id', $id)->delete();
+
+        // Obtener el usuario para eliminar su foto si tiene
+        $usuario = DB::table('users')->where('id', $id)->first();
+        if ($usuario && $usuario->foto) {
+            Storage::disk('public')->delete('uploads/' . $usuario->foto);
+        }
+
+        // Eliminar usuario
+        DB::table('users')->where('id', $id)->delete();
+
+        return response()->json(['message' => 'Atleta eliminado correctamente.'], 200);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Error al eliminar el atleta: ' . $e->getMessage()], 500);
+    }
+}
+
+
 }

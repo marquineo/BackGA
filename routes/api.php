@@ -9,6 +9,7 @@ use App\Http\Controllers\ProgressController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RutinaEntrenamientoController;
 use App\Http\Controllers\ProgresoController;
+use App\Http\Controllers\ProgresoFisicoController;
 
 //USERS
 Route::prefix('users')->group(function () {
@@ -23,6 +24,11 @@ Route::prefix('users')->group(function () {
     //clientes
     Route::post('/registrar/cliente', [UsuarioController::class, 'registrarCliente']);
     Route::get('/{trainer_id}/clientes', [UsuarioController::class, 'showByTrainer_id']);
+    Route::get('clientes/{usuarioId}/getClienteByUsuarioId', [UsuarioController::class, 'getClienteByUsuarioId']);
+    Route::post('/clientes/atletas/{id}/actualizar', [UsuarioController::class, 'actualizarAtleta']);
+    Route::delete('/clientes/atletas/{id}/eliminar', [UsuarioController::class, 'eliminar'])->name('atleta.eliminar');
+
+
 
     //entrenadores
     Route::post('/registrar/entrenador', [UsuarioController::class, 'registrarEntrenador']);
@@ -33,15 +39,23 @@ Route::prefix('users')->group(function () {
     //administradores
     Route::post('/registrar/administrador', [UsuarioController::class, 'registrarAdministrador']);
 });
+
+Route::prefix('progresos')->group(function () {
+
+    Route::get('/{clienteId}', [ProgresoFisicoController::class, 'getProgresosPorCliente']);
+    Route::post('/guardar/{clienteId}', [ProgresoFisicoController::class, 'guardarProgreso']);
+    Route::delete('/{clienteId}/{id}', [ProgresoFisicoController::class, 'eliminarProgreso']);
+});
 //RUTINAS
 Route::prefix('rutinas')->group(function () {
     Route::get('/{clienteId}', [RutinaEntrenamientoController::class, 'showRutinasByClienteId']);
     Route::put('/cliente/{clienteId}', [RutinaEntrenamientoController::class, 'guardarRutinas']);
     Route::delete('/cliente/{clienteId}/ejercicio/{ejercicioId}', [RutinaEntrenamientoController::class, 'deleteRutinaByClienteId']);
     Route::post('/clientes/{clienteId}/rutinas/eliminar', [RutinaEntrenamientoController::class, 'eliminarRutinas']);
+    //dashboard-entrenador
+    Route::get('/clientes/{clienteId}/rutinas-con-ejercicios', [RutinaEntrenamientoController::class, 'getRutinasPorClienteConEjercicios']);
 });
 
-Route::get('/progreso/{clienteId}', [ProgresoController::class, 'getProgreso']);
 
 
 //TRAINIGN-BLOCKS
