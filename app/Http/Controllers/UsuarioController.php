@@ -395,7 +395,7 @@ class UsuarioController extends Controller
     {
         $config = Configuration::getDefaultConfiguration()->setApiKey(
             'api-key',
-            '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'
+            ''
         );
 
         $apiInstance = new TransactionalEmailsApi(new Client(), $config);
