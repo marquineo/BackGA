@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -28,28 +29,27 @@ class ProgresoFisicoController extends Controller
             'imc' => 'nullable|numeric|min:0',
         ]);
 
-        $progreso = ProgresoFisico::updateOrCreate(
-            ['cliente_id' => $clienteId, 'fecha' => $data['fecha']],
-            [
-                'peso' => $data['peso'],
-                'grasa_corporal' => $data['grasa_corporal'] ?? null,
-                'circunferencia_brazo' => $data['circunferencia_brazo'] ?? null,
-                'circunferencia_cintura' => $data['circunferencia_cintura'] ?? null,
-                'imc' => $data['imc'] ?? null,
-            ]
-        );
+        $progreso = ProgresoFisico::create([
+            'cliente_id' => $clienteId,
+            'fecha' => $data['fecha'],
+            'peso' => $data['peso'],
+            'grasa_corporal' => $data['grasa_corporal'] ?? null,
+            'circunferencia_brazo' => $data['circunferencia_brazo'] ?? null,
+            'circunferencia_cintura' => $data['circunferencia_cintura'] ?? null,
+            'imc' => $data['imc'] ?? null,
+        ]);
 
         return response()->json([
-            'message' => 'Progreso guardado correctamente',
+            'message' => 'Progreso registrado correctamente',
             'progreso' => $progreso
         ]);
     }
 
+
     // Eliminar un registro de progreso específico por ID
-    public function eliminarProgreso($id, $clienteId)
+    public function eliminarProgreso($id)
     {
         $progreso = ProgresoFisico::where('id', $id)
-            ->where('cliente_id', $clienteId)
             ->first();
 
         if (!$progreso) {
@@ -59,5 +59,14 @@ class ProgresoFisicoController extends Controller
         $progreso->delete();
 
         return response()->json(['message' => 'Registro eliminado correctamente']);
+    }
+
+    public function obtenerProgresos($clienteId)
+    {
+        $progresos = ProgresoFisico::where('cliente_id', $clienteId)
+            ->orderBy('fecha', 'asc')
+            ->get(['fecha', 'peso', 'grasa_corporal']);
+
+        return response()->json($progresos);
     }
 }

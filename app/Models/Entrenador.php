@@ -19,6 +19,7 @@ class Entrenador extends Model
         'usuario_id',
         'especialidad',
         'experiencia',
+        'ishabilitado'
     ];
 
     // Definir la relación con el modelo Usuario

@@ -34,7 +34,8 @@ Route::prefix('users')->group(function () {
     Route::post('/registrar/entrenador', [UsuarioController::class, 'registrarEntrenador']);
     Route::get('/{id}/indexEntrenadorByID', [UsuarioController::class, 'indexEntrenadorByID']);
     Route::post('/{usuario_id}/actualizar/entrenador', [UsuarioController::class, 'actualizarEntrenadorPorUsuarioId']);
-
+    Route::get('/entrenadores', [UsuarioController::class, 'getAllEntrenadores']);
+    
 
     //administradores
     Route::post('/registrar/administrador', [UsuarioController::class, 'registrarAdministrador']);
@@ -43,8 +44,11 @@ Route::prefix('users')->group(function () {
 Route::prefix('progresos')->group(function () {
 
     Route::get('/{clienteId}', [ProgresoFisicoController::class, 'getProgresosPorCliente']);
+
+    Route::get('/clientes/{clienteId}/progresos', [ProgresoFisicoController::class, 'obtenerProgresos']);
+    Route::delete('/eliminar/{id}', [ProgresoFisicoController::class, 'eliminarProgreso']);
+
     Route::post('/guardar/{clienteId}', [ProgresoFisicoController::class, 'guardarProgreso']);
-    Route::delete('/{clienteId}/{id}', [ProgresoFisicoController::class, 'eliminarProgreso']);
 });
 //RUTINAS
 Route::prefix('rutinas')->group(function () {
@@ -54,7 +58,7 @@ Route::prefix('rutinas')->group(function () {
     Route::post('/clientes/{clienteId}/rutinas/eliminar', [RutinaEntrenamientoController::class, 'eliminarRutinas']);
     //dashboard-entrenador
     Route::get('/clientes/{clienteId}/rutinas-con-ejercicios', [RutinaEntrenamientoController::class, 'getRutinasPorClienteConEjercicios']);
-//dashboard-cliente
+    //dashboard-cliente
     Route::get('entrenamientos/{clienteId}', [RutinaEntrenamientoController::class, 'getEntrenamientoPorFecha']);
     Route::get('/fechas-con-entrenamiento/{clienteId}', [RutinaEntrenamientoController::class, 'getFechasConEntrenamiento']);
 });

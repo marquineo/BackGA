@@ -11,6 +11,9 @@ use App\Models\Cliente;
 use App\Models\Entrenador;
 use Illuminate\Support\Facades\DB;
 
+use SendinBlue\Client\Configuration;
+use SendinBlue\Client\Api\TransactionalEmailsApi;
+use GuzzleHttp\Client;
 
 
 class UsuarioController extends Controller
@@ -278,6 +281,9 @@ class UsuarioController extends Controller
             'creado_en' => now()
         ]);
 
+        // Enviar correo electrónico
+        $this->enviarCorreoNuevoCliente($usuario, $cliente);
+
         return response()->json(['usuario' => $usuario, 'cliente' => $cliente], 201);
     }
 
@@ -320,68 +326,118 @@ class UsuarioController extends Controller
         }
     }
 
-public function actualizarAtleta(Request $request, $id)
-{
-    $request->validate([
-        'nombre' => 'required|string|max:255',
-        'email' => 'required|email',
-        'peso' => 'required|numeric',
-        'altura' => 'required|numeric',
-        'contrasenya' => 'nullable|string',
-        'foto' => 'nullable|image|max:2048'
-    ]);
+    public function actualizarAtleta(Request $request, $id)
+    {
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'email' => 'required|email',
+            'peso' => 'required|numeric',
+            'altura' => 'required|numeric',
+            'contrasenya' => 'nullable|string',
+            'foto' => 'nullable|image|max:2048'
+        ]);
 
-    $usuario = Usuario::findOrFail($id);
-    $usuario->nombre = $request->nombre;
-    $usuario->email = $request->email;
+        $usuario = Usuario::findOrFail($id);
+        $usuario->nombre = $request->nombre;
+        $usuario->email = $request->email;
 
-    if ($request->filled('contrasenya')) {
-        $usuario->contrasenya = bcrypt($request->contrasenya);
-    }
-
-    if ($request->hasFile('foto')) {
-        $foto = $request->file('foto');
-        $fotoNombre = time() . '_' . $foto->getClientOriginalName();
-        $path = $foto->storeAs('public/atletas', $fotoNombre);
-        $usuario->fotoURL = config('app.url') . Storage::url($path);
-        //\Log::info('Nueva imagen almacenada:', ['url' => $usuario->fotoURL]);
-    } else {
-        //\Log::warning('No se recibió la imagen en el request.');
-    }
-
-    $usuario->save();
-
-    $cliente = Cliente::where('usuario_id', $usuario->id)->firstOrFail();
-    $cliente->peso = $request->peso;
-    $cliente->altura = $request->altura;
-    $cliente->save();
-
-    return response()->json([
-        'message' => 'Atleta actualizado correctamente',
-        'data' => $usuario
-    ]);
-}
-
-public function eliminar($id)
-{
-    try {
-        // Eliminar cliente asociado (si existe)
-        DB::table('clientes')->where('usuario_id', $id)->delete();
-
-        // Obtener el usuario para eliminar su foto si tiene
-        $usuario = DB::table('users')->where('id', $id)->first();
-        if ($usuario && $usuario->foto) {
-            Storage::disk('public')->delete('uploads/' . $usuario->foto);
+        if ($request->filled('contrasenya')) {
+            $usuario->contrasenya = bcrypt($request->contrasenya);
         }
 
-        // Eliminar usuario
-        DB::table('users')->where('id', $id)->delete();
+        if ($request->hasFile('foto')) {
+            $foto = $request->file('foto');
+            $fotoNombre = time() . '_' . $foto->getClientOriginalName();
+            $path = $foto->storeAs('public/atletas', $fotoNombre);
+            $usuario->fotoURL = config('app.url') . Storage::url($path);
+            //\Log::info('Nueva imagen almacenada:', ['url' => $usuario->fotoURL]);
+        } else {
+            //\Log::warning('No se recibió la imagen en el request.');
+        }
 
-        return response()->json(['message' => 'Atleta eliminado correctamente.'], 200);
-    } catch (\Exception $e) {
-        return response()->json(['error' => 'Error al eliminar el atleta: ' . $e->getMessage()], 500);
+        $usuario->save();
+
+        $cliente = Cliente::where('usuario_id', $usuario->id)->firstOrFail();
+        $cliente->peso = $request->peso;
+        $cliente->altura = $request->altura;
+        $cliente->save();
+
+        return response()->json([
+            'message' => 'Atleta actualizado correctamente',
+            'data' => $usuario
+        ]);
     }
-}
+
+    public function eliminar($id)
+    {
+        try {
+            // Eliminar cliente asociado (si existe)
+            DB::table('clientes')->where('usuario_id', $id)->delete();
+
+            // Obtener el usuario para eliminar su foto si tiene
+            $usuario = DB::table('users')->where('id', $id)->first();
+            if ($usuario && $usuario->foto) {
+                Storage::disk('public')->delete('uploads/' . $usuario->foto);
+            }
+
+            // Eliminar usuario
+            DB::table('users')->where('id', $id)->delete();
+
+            return response()->json(['message' => 'Atleta eliminado correctamente.'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al eliminar el atleta: ' . $e->getMessage()], 500);
+        }
+    }
 
 
+
+    private function enviarCorreoNuevoCliente($usuario, $cliente)
+    {
+        $config = Configuration::getDefaultConfiguration()->setApiKey(
+            'api-key',
+            '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'
+        );
+
+        $apiInstance = new TransactionalEmailsApi(new Client(), $config);
+
+        $html = "
+        <h2>Bienvenido a la familia de GymBroAnalytics!</h2>
+        <p><strong>Nombre:</strong> {$usuario->nombre}</p>
+        <p><strong>Email:</strong> {$usuario->email}</p>
+        <p><strong>Altura:</strong> {$cliente->altura} cm</p>
+        <p><strong>Peso:</strong> {$cliente->peso} kg</p>
+    ";
+
+        $email = [
+            'sender' => ['name' => 'GymBroAnalytics', 'email' => 'marcoscosasclase@gmail.com'],
+            'to' => [['email' => $usuario->email, 'name' => 'Admin']],
+            'subject' => 'Nuevo cliente registrado: ' . $usuario->nombre,
+            'htmlContent' => $html,
+        ];
+
+        try {
+            $apiInstance->sendTransacEmail($email);
+        } catch (\Exception $e) {
+            \Log::error('Error enviando email: ' . $e->getMessage());
+        }
+    }
+
+    private function getAllEntrenadores()
+    {
+        $entrenadores = Entrenador::with('usuario')
+            ->get()
+            ->map(function ($entrenador) {
+                return [
+                    'id' => $entrenador->id,
+                    'usuario_id' => $entrenador->usuario_id,
+                    'nombre' => $entrenador->usuario->nombre ?? '',
+                    'especialidad' => $entrenador->especialidad,
+                    'experiencia' => $entrenador->experiencia,
+                    'ishabilitado' => $entrenador->ishabilitado ?? false,
+                    'fotoURL' => $entrenador->usuario->fotoURL ?? ''
+                ];
+            });
+
+        return response()->json($entrenadores);
+    }
 }
