@@ -19,6 +19,7 @@ class Usuario extends Model
         'contrasenya',
         'rol',
         'creado_en',
+        'fotoURL'
     ];
     
     // Validación o personalización de métodos pueden ir aquí más tarde

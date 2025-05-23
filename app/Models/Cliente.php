@@ -11,12 +11,16 @@ class Cliente extends Model
 
     protected $table = 'clientes';
 
+    public $timestamps = false;
+
+
     protected $fillable = [
         'usuario_id',
         'altura',
         'peso',
         'grasa_corporal',
         'fecha_nacimiento',
+        'entrenador_id'
     ];
 
     // Relación con el modelo Usuario
