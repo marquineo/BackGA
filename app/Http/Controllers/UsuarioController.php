@@ -188,6 +188,7 @@ class UsuarioController extends Controller
             $usuario->email = $request->email;
         }
 
+
         if ($request->filled('contrasenya')) {
             $usuario->contrasenya = bcrypt($request->contrasenya);
         }
@@ -203,6 +204,10 @@ class UsuarioController extends Controller
         // Actualizar datos del entrenador
         if ($request->filled('especialidad')) {
             $entrenador->especialidad = $request->especialidad;
+        }
+
+        if ($request->filled('ishabilitado')) {
+            $entrenador->ishabilitado = $request->ishabilitado;
         }
 
         if ($request->filled('experiencia')) {
@@ -391,7 +396,7 @@ class UsuarioController extends Controller
 
 
 
-    private function enviarCorreoNuevoCliente($usuario, $cliente)
+    public function enviarCorreoNuevoCliente($usuario, $cliente)
     {
         $config = Configuration::getDefaultConfiguration()->setApiKey(
             'api-key',
@@ -422,7 +427,7 @@ class UsuarioController extends Controller
         }
     }
 
-    private function getAllEntrenadores()
+    public function getAllEntrenadores()
     {
         $entrenadores = Entrenador::with('usuario')
             ->get()
