@@ -11,6 +11,11 @@ use App\Http\Controllers\RutinaEntrenamientoController;
 use App\Http\Controllers\ProgresoController;
 use App\Http\Controllers\ProgresoFisicoController;
 
+Route::get('/test-cors', function () {
+    \Log::info('Test CORS route hit!');
+    return response()->json(['message' => 'CORS test OK']);
+});
+
 //USERS
 Route::prefix('users')->group(function () {
     Route::get('/', [UsuarioController::class, 'index']);
@@ -99,4 +104,7 @@ Route::prefix('roles')->group(function () {
     Route::get('/{id}', [RoleController::class, 'show']);
     Route::put('/{id}', [RoleController::class, 'update']);
     Route::delete('/{id}', [RoleController::class, 'destroy']);
+});
+Route::options('/test-cors', function () {
+    return response()->json(['message' => 'CORS working']);
 });

@@ -99,6 +99,7 @@ class UsuarioController extends Controller
 
     public function checkUserLogin(Request $request)
     {
+    \Log::info('Login attempt', ['input' => $request->all()]);
         $data = $request->validate([
             'Usuarioname' => 'required|string',
             'password' => 'required|string'

@@ -2,11 +2,11 @@
 
 return [
 
-    'paths' => ['*'],
+    'paths' => ['users/*','progresos/*','rutinas/*'], // Evita usar '*', Laravel no lo recomienda
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => ['https://www.gymbroanalytics.xyz'], // SIN slash al final
 
     'allowed_origins_patterns' => [],
 
@@ -19,3 +19,4 @@ return [
     'supports_credentials' => false,
 
 ];
+
