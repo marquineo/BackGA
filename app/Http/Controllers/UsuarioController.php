@@ -121,7 +121,16 @@ class UsuarioController extends Controller
                 'message' => 'Credenciales incorrectas.'
             ]);
         }*/
-
+        if($usuario->rol == "entrenador"){
+            $entrenador = Entrenador::where('usuario_id',$usuario->id)->first();
+            return response()->json([
+            'success' => true,
+            'status' => 200,
+            'rol' => $usuario->rol,
+            'id' => $usuario->id,
+            'ishabilitado' => $entrenador->ishabilitado,
+        ]);
+        }
         return response()->json([
             'success' => true,
             'status' => 200,
@@ -152,6 +161,7 @@ class UsuarioController extends Controller
             'usuario_id' => $usuario->id,
             'especialidad' => $request->especialidad,
             'experiencia' => $request->experiencia,
+            'ishabilitado' => false,
             'creado_en' => now()
         ]);
 
@@ -242,6 +252,7 @@ class UsuarioController extends Controller
             'especialidad' => $entrenador->especialidad,
             'experiencia' => $entrenador->experiencia,
             'creado_en' => $entrenador->usuario->creado_en,
+            'ishabilitado' => $entrenador->ishabilitado,
         ]);
     }
 
@@ -444,5 +455,25 @@ class UsuarioController extends Controller
             });
 
         return response()->json($entrenadores);
+    }
+
+    public function deleteEntrenador($id)
+    {
+        $entrenador = Entrenador::find($id);
+
+        if (!$entrenador) {
+            return response()->json(['mensaje' => 'Entrenador no encontrado.'], 404);
+        }
+
+        $entrenador->delete();
+        $usuario = $entrenador->usuario;
+        $entrenador->delete();
+
+        if ($usuario) {
+            $usuario->delete();
+        }
+
+
+        return response()->json(['mensaje' => 'Entrenador eliminado correctamente.'], 200);
     }
 }
