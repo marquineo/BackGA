@@ -206,9 +206,10 @@ class UsuarioController extends Controller
 
         if ($request->hasFile('foto')) {
             $foto = $request->file('foto');
-            $path = $foto->store('public/entrenadores');
+            $path = $foto->store('entrenadores', 'public'); // <- cambia aquí
             $usuario->fotoURL = Storage::url($path);
         }
+
 
         $usuario->save();
 
@@ -274,7 +275,7 @@ class UsuarioController extends Controller
 
         if ($request->hasFile('foto')) {
             $foto = $request->file('foto');
-            $path = $foto->store('public/atletas');
+            $path = $foto->store('entrenadores', 'public'); // <- cambia aquí
             $fotoURL = Storage::url($path);
             //\Log::info('Imagen subida:', ['url' => $fotoURL]);
         } else {
@@ -365,7 +366,8 @@ class UsuarioController extends Controller
         if ($request->hasFile('foto')) {
             $foto = $request->file('foto');
             $fotoNombre = time() . '_' . $foto->getClientOriginalName();
-            $path = $foto->storeAs('public/atletas', $fotoNombre);
+            $path = $foto->storeAs('atletas', $fotoNombre, 'public');
+
             $usuario->fotoURL = Storage::url($path);
 
             //\Log::info('Nueva imagen almacenada:', ['url' => $usuario->fotoURL]);
