@@ -40,6 +40,7 @@ Route::prefix('users')->group(function () {
     Route::get('/{id}/indexEntrenadorByID', [UsuarioController::class, 'indexEntrenadorByID']);
     Route::post('/{usuario_id}/actualizar/entrenador', [UsuarioController::class, 'actualizarEntrenadorPorUsuarioId']);
     Route::get('/entrenadores', [UsuarioController::class, 'getAllEntrenadores']);
+    Route::delete('/entrenador/{id}/eliminar', [UsuarioController::class, 'deleteEntrenador']);
     
 
     //administradores
