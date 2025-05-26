@@ -121,15 +121,15 @@ class UsuarioController extends Controller
                 'message' => 'Credenciales incorrectas.'
             ]);
         }*/
-        if($usuario->rol == "entrenador"){
-            $entrenador = Entrenador::where('usuario_id',$usuario->id)->first();
+        if ($usuario->rol == "entrenador") {
+            $entrenador = Entrenador::where('usuario_id', $usuario->id)->first();
             return response()->json([
-            'success' => true,
-            'status' => 200,
-            'rol' => $usuario->rol,
-            'id' => $usuario->id,
-            'ishabilitado' => $entrenador->ishabilitado,
-        ]);
+                'success' => true,
+                'status' => 200,
+                'rol' => $usuario->rol,
+                'id' => $usuario->id,
+                'ishabilitado' => $entrenador->ishabilitado,
+            ]);
         }
         return response()->json([
             'success' => true,
@@ -206,7 +206,7 @@ class UsuarioController extends Controller
         if ($request->hasFile('foto')) {
             $foto = $request->file('foto');
             $path = $foto->store('public/entrenadores');
-            $usuario->fotoURL = config('app.url') . Storage::url($path);
+            $usuario->fotoURL = Storage::url($path);
         }
 
         $usuario->save();
@@ -274,7 +274,7 @@ class UsuarioController extends Controller
         if ($request->hasFile('foto')) {
             $foto = $request->file('foto');
             $path = $foto->store('public/atletas');
-            $fotoURL = config('app.url') . Storage::url($path);
+            $fotoURL = Storage::url($path);
             //\Log::info('Imagen subida:', ['url' => $fotoURL]);
         } else {
             //\Log::warning('El archivo "foto" no se recibió en el request.');
@@ -365,7 +365,8 @@ class UsuarioController extends Controller
             $foto = $request->file('foto');
             $fotoNombre = time() . '_' . $foto->getClientOriginalName();
             $path = $foto->storeAs('public/atletas', $fotoNombre);
-            $usuario->fotoURL = config('app.url') . Storage::url($path);
+            $usuario->fotoURL = Storage::url($path);
+
             //\Log::info('Nueva imagen almacenada:', ['url' => $usuario->fotoURL]);
         } else {
             //\Log::warning('No se recibió la imagen en el request.');
