@@ -1,66 +1,130 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# BackGA
+[![Ask DeepWiki](https://devin.ai/assets/askdeepwiki.png)](https://deepwiki.com/marquineo/BackGA)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+BackGA is the backend API for GymBroAnalytics, a fitness application designed to connect trainers and clients. It provides a robust system for managing users, creating personalized training routines, tracking physical progress, and facilitating communication.
 
-## About Laravel
+Built with the Laravel framework, this repository contains all the necessary components to run the server-side logic of the application.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Key Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+*   **Multi-Role User System**: Supports `admin`, `entrenador` (trainer), and `cliente` (client) roles with distinct functionalities.
+*   **User Management**: Full CRUD capabilities for trainers, clients, and administrators.
+*   **Trainer & Client Dashboard Support**: Endpoints to fetch data specific to trainer and client dashboards, such as client lists for trainers.
+*   **Personalized Training Routines**: Trainers can create, update, and assign detailed training routines to their clients. Routines include exercises with specified sets, reps, rest times, and RPE.
+*   **Physical Progress Tracking**: Clients can log their physical metrics over time, including weight, body fat percentage, and various circumferences. The API provides endpoints to visualize this progress.
+*   **Workout Scheduling**: Exercises can be assigned to specific dates, allowing clients to see their workout plan for any given day.
+*   **Email Notifications**: Integrated with Sendinblue to automatically send emails for significant events, such as when a new client registers or a new routine is assigned.
+*   **Image Uploads**: Support for uploading and storing profile pictures for users.
+*   **Containerized Deployment**: Includes a `Dockerfile` for easy setup and deployment using Docker.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Built With
 
-## Learning Laravel
+*   [Laravel 11](https://laravel.com/)
+*   [PHP 8.2](https://www.php.net/)
+*   [PostgreSQL](https://www.postgresql.org/)
+*   [Sendinblue (Brevo)](https://www.brevo.com/) for transactional emails
+*   [Docker](https://www.docker.com/)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Getting Started
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+To get a local copy up and running, follow these simple steps.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Prerequisites
 
-## Laravel Sponsors
+*   PHP >= 8.2
+*   Composer
+*   PostgreSQL Database
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Installation
 
-### Premium Partners
+1.  **Clone the repository:**
+    ```sh
+    git clone https://github.com/marquineo/BackGA.git
+    cd BackGA
+    ```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+2.  **Install PHP dependencies:**
+    ```sh
+    composer install
+    ```
 
-## Contributing
+3.  **Create and configure the environment file:**
+    Copy the example environment file and generate an application key.
+    ```sh
+    cp .env.example .env
+    php artisan key:generate
+    ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+4.  **Configure your `.env` file:**
+    Update the database connection details (`DB_*`) and mailer settings to match your local environment.
+    ```ini
+    DB_CONNECTION=pgsql
+    DB_HOST=127.0.0.1
+    DB_PORT=5432
+    DB_DATABASE=your_database
+    DB_USERNAME=your_username
+    DB_PASSWORD=your_password
 
-## Code of Conduct
+    MAIL_MAILER=log
+    MAIL_FROM_ADDRESS=hello@example.com
+    MAIL_FROM_NAME="${APP_NAME}"
+    ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+5.  **Run database migrations:**
+    This will create all the necessary tables in your database.
+    ```sh
+    php artisan migrate
+    ```
 
-## Security Vulnerabilities
+6.  **Create the storage link:**
+    This makes uploaded files (like profile pictures) publicly accessible.
+    ```sh
+    php artisan storage:link
+    ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+7.  **Start the development server:**
+    ```sh
+    php artisan serve
+    ```
+    The API will be available at `http://127.0.0.1:8000`.
 
-## License
+## Docker Setup
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+You can also run the application within a Docker container.
+
+1.  **Build the Docker image:**
+    ```sh
+    docker build -t backga .
+    ```
+
+2.  **Run the container:**
+    This command will start the application and map port 10000 on your host to port 10000 in the container.
+    ```sh
+    docker run -p 10000:10000 -d --name backga-container -v $(pwd):/var/www/html backga
+    ```
+    Ensure your `.env` file is configured to connect to your database from within the Docker network. The API will be accessible at `http://localhost:10000`.
+
+## API Endpoints
+
+The API provides a set of RESTful endpoints to manage the application's data.
+
+| Method | Endpoint                                        | Description                                        |
+| :----- | :---------------------------------------------- | :------------------------------------------------- |
+| **Auth** | | |
+| POST   | `/api/users/login`                              | Authenticate a user and get their role and ID.     |
+| POST   | `/api/users/registrar/cliente`                  | Register a new client.                             |
+| POST   | `/api/users/registrar/entrenador`               | Register a new trainer.                            |
+| **Users** | | |
+| GET    | `/api/users/{trainer_id}/clientes`              | Get all clients assigned to a specific trainer.    |
+| POST   | `/api/users/clientes/atletas/{id}/actualizar`   | Update a client's profile information.             |
+| GET    | `/api/users/entrenadores`                       | Get a list of all trainers.                         |
+| POST   | `/api/users/{usuario_id}/actualizar/entrenador` | Update a trainer's profile information.            |
+| **Routines** | | |
+| PUT    | `/api/rutinas/cliente/{clienteId}`              | Create or update a training routine for a client.  |
+| GET    | `/api/rutinas/{clienteId}`                      | Get all routines for a specific client.            |
+| GET    | `/api/rutinas/entrenamientos/{clienteId}`       | Get a client's scheduled workout for a given date. |
+| POST | `/api/rutinas/clientes/{clienteId}/rutinas/eliminar` | Delete specified routines for a client. |
+| **Progress** | | |
+| POST   | `/api/progresos/guardar/{clienteId}`            | Save a new physical progress entry for a client.   |
+| GET    | `/api/progresos/{clienteId}`                    | Get all physical progress entries for a client.    |
+| DELETE | `/api/progresos/eliminar/{id}`                  | Delete a specific physical progress entry.         |
